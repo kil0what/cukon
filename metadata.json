@@ -1,0 +1,6 @@
+{
+  "name": "ЦУКОН — управление коммерческой недвижимостью",
+  "description": "Веб-сайт и CMS управляющей компании ЦУКОН (цукон.рф): каталог объектов и свободных помещений, интерактивная карта, формы заявок с антиспамом, SEO, Яндекс.Метрика и экспорт темы WordPress.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

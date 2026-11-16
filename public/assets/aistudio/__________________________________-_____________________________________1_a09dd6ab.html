@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ЦУКОН — управление производственно-коммерческой недвижимостью в Мордовии</title>
+<meta name="description" content="ЦУКОН — управляющая компания. Аренда производственных и коммерческих помещений в Мордовии с готовой инфраструктурой.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏭</text></svg>">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500&family=Unbounded:wght@400;500;600&display=swap">
+<!-- Яндекс Метрика: вставить счётчик сюда -->
+<style>
+:root{--bg:#f1f2f3;--card:#fff;--ink:#15171a;--mute:#5d636b;--line:#d3d6d9;--acc:#2447ff;--dark:#111316;--ok:#14803f;--wait:#a35f00;--off:#7b8088;--dsp:Unbounded,"Arial Black",system-ui,sans-serif;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e0f11;--card:#1a1c1f;--ink:#f1f2f3;--mute:#9ba1a9;--line:#2c2f33;--acc:#6f8aff;--dark:#000;--ok:#5fd18a;--wait:#e3a94d;--off:#8f959d;color-scheme:dark}}
+*{box-sizing:border-box;margin:0}
+html{scroll-padding-top:84px}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.6 Onest,system-ui,"Segoe UI",Arial,sans-serif;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+.w{max-width:1200px;margin:0 auto;padding:0 24px}
+section{padding:72px 0}
+h1,h2,h3,.dsp{font-family:var(--dsp);font-weight:500;letter-spacing:-.025em;line-height:1.08}
+h1{font-size:clamp(30px,6.4vw,84px)}
+h2{font-size:clamp(23px,3.4vw,42px)}
+h3{font-size:15px;letter-spacing:-.01em;line-height:1.3}
+.sub h1{font-size:clamp(28px,4.6vw,56px);max-width:18ch}
+.mute{color:var(--mute)}
+header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;gap:18px;height:68px}
+.logo{display:flex;align-items:center;gap:10px;font:600 19px var(--dsp);letter-spacing:-.02em}
+.logo i{width:26px;height:26px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:600 13px var(--dsp);font-style:normal;transition:background .3s,transform .4s}
+.logo:hover i{background:var(--acc);transform:rotate(90deg)}
+nav{display:flex;gap:2px;margin-left:auto}
+nav a{position:relative;padding:8px 11px;font-size:14px;color:var(--mute);transition:color .2s}
+nav a::after{content:"";position:absolute;left:11px;right:11px;bottom:2px;height:2px;background:var(--acc);transform:scaleX(0);transform-origin:left;transition:transform .3s}
+nav a:hover,nav a.on{color:var(--ink)}nav a:hover::after,nav a.on::after{transform:scaleX(1)}
+.btn{position:relative;overflow:hidden;isolation:isolate;display:inline-block;border:0;cursor:pointer;font:500 14px Onest,sans-serif;padding:14px 24px;border-radius:99px;background:var(--ink);color:var(--bg);transition:color .3s}
+.btn::before{content:"";position:absolute;inset:0;background:var(--acc);transform:translateY(101%);transition:transform .4s cubic-bezier(.2,.7,.2,1);z-index:-1}
+.btn:hover{color:#fff}.btn:hover::before{transform:none}
+.btn.l{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.burger{display:none;margin-left:auto;background:none;border:1px solid var(--ink);border-radius:99px;padding:8px 16px;color:var(--ink);font:500 14px Onest}
+.hero{padding:48px 0 0}
+.hero h1 span.m{display:block;overflow:hidden;padding-bottom:.08em}
+.hero h1 span.m>span{display:block;transform:translateY(105%);animation:up .9s cubic-bezier(.2,.8,.2,1) forwards}
+.hero h1 span.m:nth-child(2)>span{animation-delay:.12s}.hero h1 span.m:nth-child(3)>span{animation-delay:.24s}
+.lead{display:flex;justify-content:space-between;gap:28px;align-items:flex-end;flex-wrap:wrap;margin:28px 0 36px}
+.lead p{max-width:46ch;color:var(--mute)}
+.lead div{display:flex;gap:10px;flex-wrap:wrap}
+.scene{position:relative;background:var(--card);border-radius:22px 22px 0 0;padding:18px 18px 0;color:var(--ink)}
+.scene svg{display:block;width:100%;height:auto}
+.scene svg *{vector-effect:non-scaling-stroke}
+.hero-svg [data-g],.hero-svg .s{fill:none;stroke:currentColor;stroke-width:1.6;transition:opacity .3s,color .3s}
+.hero-svg path,.hero-svg circle,.hero-svg rect:not(.lt){stroke-dasharray:1;stroke-dashoffset:1;animation:dr 1.5s cubic-bezier(.6,0,.2,1) forwards}
+.lt{fill:var(--acc);stroke:none;opacity:0;animation:lit .5s var(--d) forwards}
+.lt:nth-child(5n){animation:lit .5s var(--d) forwards,bl 7s calc(var(--d) + 1s) infinite}
+.hero-svg.dim [data-g]{opacity:.18}
+.hero-svg.dim [data-g].hl{opacity:1;color:var(--acc)}
+.live{position:absolute;left:30px;top:26px;font-size:13px;display:flex;gap:8px;align-items:center;background:var(--bg);padding:6px 14px;border-radius:99px;opacity:0;animation:fade .6s 3s forwards}
+.live i,.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:pulse 2s infinite}
+.inf{display:grid;grid-template-columns:repeat(5,1fr);background:var(--card);border-top:1px solid var(--line);border-radius:0 0 22px 22px}
+.inf button{all:unset;box-sizing:border-box;cursor:pointer;padding:22px 20px 26px;border-left:1px solid var(--line);transition:background .25s}
+.inf button:first-child{border-left:0}
+.inf button:hover,.inf button:focus-visible{background:var(--bg)}
+.inf h3{margin-bottom:6px}.inf p{font-size:13.5px;color:var(--mute);line-height:1.45}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);margin-top:64px;border-top:1px solid var(--ink)}
+.stats div{padding:20px 20px 0 0}
+.stats b{display:block;font:500 clamp(44px,7vw,92px)/1 var(--dsp);letter-spacing:-.04em}
+.big{font-family:var(--dsp);font-weight:400;font-size:clamp(20px,2.8vw,34px);line-height:1.25;letter-spacing:-.02em;max-width:26em}
+.big span{color:var(--mute)}
+.orow{display:grid;grid-template-columns:2fr 1.4fr auto 40px;gap:20px;align-items:center;padding:26px 14px;border-top:1px solid var(--line);transition:background .35s,color .35s,padding .35s;text-align:left;width:100%;background:none;border-left:0;border-right:0;border-bottom:0;color:inherit;font:inherit;cursor:pointer}
+.orow:last-of-type{border-bottom:1px solid var(--line)}
+.orow:hover,.orow:focus-visible{background:var(--ink);color:var(--bg);padding-left:28px}
+.orow h3{font-size:clamp(16px,2vw,24px)}
+.orow .mu{opacity:.65;font-size:14px}
+.ar{width:34px;height:34px;border-radius:50%;border:1px solid currentColor;position:relative;transition:transform .35s,background .35s}
+.ar::after{content:"";position:absolute;left:11px;top:13px;width:9px;height:9px;border:solid currentColor;border-width:1.5px 1.5px 0 0;transform:rotate(45deg) translate(-2px,2px)}
+.orow:hover .ar{transform:rotate(-45deg);background:var(--acc);border-color:var(--acc);color:#fff}
+.pan{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ctr{text-align:center;margin:0 0 28px}
+.objs{display:flex;flex-wrap:wrap;justify-content:center;gap:16px}
+.obox{position:relative;flex:1 1 300px;max-width:380px}
+.obox .ar{position:absolute;right:18px;bottom:16px}
+.obox:hover .ar{transform:rotate(-45deg);background:var(--acc);border-color:var(--acc);color:#fff}
+.obox .price{padding-right:56px}
+.pan a{display:flex;flex-direction:column;justify-content:space-between;gap:70px;min-height:300px;padding:30px;border-radius:22px;background:var(--card);transition:transform .4s cubic-bezier(.2,.7,.2,1)}
+.pan a:nth-child(2){background:var(--acc);color:#fff}
+.pan a:hover{transform:translateY(-6px)}
+.pan p{opacity:.75;max-width:34ch;margin-top:10px}
+.proc{--p:0;background:var(--dark);color:#f1f2f3;border-radius:28px;padding:56px;display:grid;grid-template-columns:1fr 1.3fr;gap:50px;position:relative}
+.proc .hd{position:sticky;top:110px;align-self:start}
+.proc .hd p{color:#9ba1a9;margin-top:14px;max-width:30ch}
+.sts{position:relative;padding-left:44px}
+.sts::before,.sts::after{content:"";position:absolute;left:11px;top:6px;width:2px;background:#33363b}
+.sts::before{bottom:6px}
+.sts::after{background:var(--acc);height:calc((100% - 12px)*var(--p));transition:height .15s linear}
+.st{position:relative;padding-bottom:44px;opacity:.35;transition:opacity .5s}
+.st.on{opacity:1}
+.st::before{content:attr(data-n);position:absolute;left:-44px;top:0;width:24px;height:24px;border-radius:50%;background:#33363b;display:grid;place-items:center;font-size:11px;transition:background .4s}
+.st.on::before{background:var(--acc)}
+.st:last-child{padding-bottom:0}
+.st h3{font-size:20px;margin-bottom:6px}.st p{color:#a9aeb5;max-width:44ch}
+details{border-bottom:1px solid var(--line)}
+summary{list-style:none;cursor:pointer;padding:22px 4px;display:flex;justify-content:space-between;gap:14px;font:500 clamp(16px,2vw,20px) var(--dsp);letter-spacing:-.02em}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font:300 28px/1 Onest;transition:transform .3s}
+details[open] summary::after{transform:rotate(45deg)}
+details p{padding:0 4px 24px;color:var(--mute);max-width:60ch}
+.fl{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.fl>div{background:var(--card);border-radius:20px;padding:26px}
+.fl h3{margin-bottom:8px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:22px 0}
+.bar select{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:99px;padding:10px 18px}
+.grid{display:flex;flex-wrap:wrap;justify-content:center;gap:14px}
+.grid>*{flex:1 1 260px;max-width:360px}
+.card{background:var(--card);border-radius:20px;padding:12px;border:0;text-align:left;color:inherit;font:inherit;display:block;width:100%;cursor:pointer;transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s}
+.card:hover{transform:translateY(-5px);box-shadow:0 18px 40px -22px rgba(0,0,0,.45)}
+.pic{position:relative;height:140px;border-radius:12px;margin-bottom:14px;overflow:hidden;background:var(--bg) linear-gradient(var(--line) 1px,transparent 1px) 0 0/22px 22px,linear-gradient(90deg,var(--line) 1px,transparent 1px) 0 0/22px 22px;display:flex;align-items:flex-end;padding:12px}
+.pic b{font:500 30px/1 var(--dsp);letter-spacing:-.04em}
+.pic small{position:absolute;right:12px;top:10px;font-size:11px;color:var(--mute)}
+.card h3,.card .cap,.card .row{padding:0 6px}
+.cap{color:var(--mute);font-size:13.5px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:2px 0 6px}
+.price{display:block;padding:10px 6px 4px;font-weight:500}
+.tag{display:inline-flex;gap:7px;align-items:center;font-size:12px;white-space:nowrap}
+.tag::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.tag.free::before{animation:pulse 2s infinite}
+.free{color:var(--ok)}.booked{color:var(--wait)}.rented{color:var(--off)}
+.map{border-radius:22px;background:var(--card);overflow:hidden}
+.map svg{display:block;width:100%;height:auto;color:var(--ink)}
+.pin{cursor:pointer}
+.pin circle{fill:var(--ink);transition:fill .25s,r .25s}
+.pin:hover circle,.pin:focus-visible circle{fill:var(--acc);r:21}
+.pin text{fill:var(--bg);font:600 12px var(--dsp)}
+.f{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:22px 20px;margin-top:28px}
+.f input,.f select,.f textarea{font:inherit;color:var(--ink);background:none;border:0;border-bottom:1px solid var(--ink);border-radius:0;padding:12px 0;width:100%;transition:border-color .25s,box-shadow .25s}
+.f input:focus,.f select:focus,.f textarea:focus{outline:0;border-color:var(--acc);box-shadow:0 1px 0 var(--acc)}
+.f .full{grid-column:1/-1}
+.f label.ck{display:flex;gap:10px;font-size:13px;color:var(--mute);align-items:flex-start}
+.f label.ck input{width:auto;margin-top:3px}
+.hp{position:absolute;left:-9999px;height:0;overflow:hidden}
+.msg{padding:14px 0;display:none;color:var(--acc)}
+.fbox{background:var(--card);border-radius:28px;padding:48px}
+dialog{border:0;border-radius:24px;padding:0;max-width:600px;width:calc(100% - 28px);background:var(--bg);color:var(--ink)}
+dialog[open]{animation:pop .35s cubic-bezier(.2,.8,.2,1)}
+dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
+.dl{padding:20px}
+.dl dl{display:grid;grid-template-columns:auto 1fr;gap:10px 24px;margin:18px 0}
+.dl dt{color:var(--mute)}
+footer{background:var(--dark);color:#f1f2f3;border-radius:28px 28px 0 0;margin-top:40px;overflow:hidden}
+.fg{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:30px;padding:56px 0 20px}
+footer a{display:block;color:#a9aeb5;padding:3px 0;transition:color .2s,transform .2s}
+footer a:hover{color:#fff;transform:translateX(4px)}
+.mark{font:600 clamp(70px,22vw,300px)/.8 var(--dsp);letter-spacing:-.05em;color:transparent;-webkit-text-stroke:1px #3d4146;text-align:center;white-space:nowrap;margin-bottom:-.06em;user-select:none}
+.wm{text-align:center;font-size:12px;color:#8a9097;padding:18px 20px calc(18px + env(safe-area-inset-bottom,0px));background:#000}
+@keyframes up{to{transform:none}}
+@keyframes dr{to{stroke-dashoffset:0}}
+@keyframes lit{to{opacity:1}}
+@keyframes bl{0%,88%,100%{opacity:1}92%{opacity:.1}}
+@keyframes fade{to{opacity:1}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,currentColor 55%,transparent)}70%{box-shadow:0 0 0 7px transparent}}
+@keyframes pop{from{opacity:0;transform:translateY(18px) scale(.97)}}
+@media(max-width:900px){
+.burger{display:block}
+nav{display:none;position:absolute;left:0;right:0;top:100%;background:var(--bg);flex-direction:column;padding:10px 24px 18px;border-bottom:1px solid var(--line)}
+nav.open{display:flex}.nav>.btn{display:none}
+.inf{grid-template-columns:1fr 1fr}.inf button{border-top:1px solid var(--line)}
+.stats,.pan,.fl,.proc,.fg{grid-template-columns:1fr}
+.orow{grid-template-columns:1fr 40px}.orow .mu,.orow .fr{grid-column:1}
+.proc{padding:28px}.proc .hd{position:static}
+.fbox{padding:26px}section{padding:48px 0}
+}
+.btn,.burger{min-height:44px}.btn{display:inline-flex;align-items:center;justify-content:center}
+dialog{max-height:92vh;max-height:92dvh;overflow:auto}
+@media(max-width:900px){nav a{padding:13px 4px}nav a::after{left:4px;right:4px}.inf button:last-child:nth-child(odd){grid-column:1/-1}}
+@media(max-width:600px){.w{padding:0 16px}h1{font-size:clamp(28px,9.2vw,44px)}.hero{padding-top:26px}.lead{margin:20px 0 24px}.lead div,.lead .btn{width:100%}.scene{padding:10px 10px 0;border-radius:16px 16px 0 0}.live{left:14px;top:12px;font-size:12px}.inf{grid-template-columns:1fr;border-radius:0 0 16px 16px}.inf button{padding:16px}.stats{margin-top:40px}.proc,.fbox{padding:22px;border-radius:20px}.pan a{min-height:220px;gap:40px;padding:22px}.bar select{flex:1 1 100%}.dl dl{grid-template-columns:1fr;gap:2px}.dl dt{margin-top:8px}footer{border-radius:20px 20px 0 0}.fg{padding-top:36px}.obox,.grid>*{max-width:none}}
+@media(max-width:380px){.nav{gap:8px}.logo{font-size:17px}}
+@media(min-width:1500px){.w{max-width:1360px}body{font-size:17px}}
+@media(hover:none){.card:hover{transform:none;box-shadow:none}.pan a:hover{transform:none}}
+@media(max-height:500px) and (orientation:landscape){header{position:static}.hero{padding-top:18px}.proc .hd{position:static}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.hero h1 span.m>span{transform:none}.hero-svg *{stroke-dashoffset:0}.lt,.live{opacity:1}}
+</style>
+</head>
+<body>
+<header><div class="w nav">
+<a class="logo" href="#/" aria-label="ЦУКОН — на главную"><i>Ц</i>ЦУКОН</a>
+<button class="burger" aria-expanded="false" id="bg">Меню</button>
+<nav id="nav" aria-label="Основное меню"><a href="#/">Главная</a><a href="#/objects">Объекты</a><a href="#/tenants">Арендаторам</a><a href="#/owners">Собственникам</a><a href="#/residents">Резиденты</a><a href="#/about">О компании</a><a href="#/contacts">Контакты</a></nav>
+<a class="btn" href="#/tenants" data-go=".fbox">Подобрать помещение</a>
+</div></header>
+<main id="app"></main>
+<footer>
+<div class="w fg">
+<div><div class="logo"><i>Ц</i>ЦУКОН</div><p style="margin-top:16px;max-width:34ch;color:#a9aeb5">Недвижимость, которая работает.<br>Управление производственно-коммерческой недвижимостью в Республике Мордовия.</p></div>
+<div><a href="#/objects">Объекты</a><a href="#/tenants">Арендаторам</a><a href="#/owners">Собственникам</a><a href="#/residents">Резиденты</a><a href="#/about">О компании</a></div>
+<div><a href="tel:+70000000000">+7 (000) 000-00-00</a><a href="mailto:info@example.ru">info@example.ru</a><a href="#/contacts">Республика Мордовия, г. Саранск</a><a href="#/privacy">Политика конфиденциальности</a></div>
+</div>
+<div class="mark" aria-hidden="true">ЦУКОН</div>
+<p class="wm">© ЦУКОН, 2026 · Сайт создан Вероникой Агафоновой · Прототип, не для коммерческого использования</p>
+</footer>
+<dialog id="dlg"><div class="dl" id="dlb"></div></dialog>
+
+<script>
+const ST={free:'Свободно',booked:'Забронировано',rented:'Сдано'};
+const PU={prod:'Производство',wh:'Склад',off:'Офис'};
+// Демо-данные. Реальные объекты и помещения будут вноситься через CMS.
+const OBJ=[
+{id:1,n:'Производственная площадка «Северная»',a:'г. Саранск, ул. Примерная, 1',x:150,y:90},
+{id:2,n:'Бизнес-центр «Центральный»',a:'г. Саранск, пр. Примерный, 10',x:330,y:170},
+{id:3,n:'Складской комплекс «Южный»',a:'г. Саранск, ул. Образцовая, 5',x:470,y:260}];
+const RM=[
+{id:1,o:1,t:'Производственный цех',s:620,u:'prod',p:380,st:'free',f:['Ворота 4×4 м','Кран-балка 5 т','Электричество 150 кВт','Газ','Отопление']},
+{id:2,o:1,t:'Склад',s:450,u:'wh',p:290,st:'free',f:['Пандус','Отопление','Электричество 30 кВт']},
+{id:3,o:1,t:'Цех малый',s:180,u:'prod',p:410,st:'booked',f:['Ворота 3×3 м','Электричество 60 кВт','Вода']},
+{id:4,o:2,t:'Офис 34',s:48,u:'off',p:900,st:'free',f:['Мебель по желанию','Интернет','Охрана','Уборка']},
+{id:5,o:2,t:'Офис 12',s:96,u:'off',p:850,st:'rented',f:['2 кабинета','Интернет','Охрана']},
+{id:6,o:3,t:'Склад-бокс А',s:300,u:'wh',p:260,st:'free',f:['Рампа','Круглосуточный доступ','Видеонаблюдение']},
+{id:7,o:3,t:'Склад-бокс Б',s:520,u:'wh',p:250,st:'booked',f:['Рампа','Круглосуточный доступ']},
+{id:8,o:3,t:'Производственное помещение',s:260,u:'prod',p:340,st:'free',f:['Электричество 80 кВт','Ворота 3,5 м']}];
+const INF=[['power','Электроснабжение','Подача мощности и контроль сетей.'],['gas','Газоснабжение','Газ для производства и отопления.'],['guard','Охрана и доступ','Въезд на территорию под контролем.'],['clean','Содержание территории','Уборка и порядок на площадке.'],['eng','Инженерные системы','Вентиляция, отопление, водоснабжение.']];
+const FAQ=[['Что входит в аренду, кроме площади?','Электроснабжение, газоснабжение, охрана, доступ на территорию, содержание и уборка территории, эксплуатация инженерных систем.'],
+['Как быстро можно получить помещение?','Подберём варианты в течение рабочего дня и покажем объект. Сроки заселения зависят от состояния помещения и условий договора.'],
+['Можно ли забронировать помещение?','Да. Бронь отображается на сайте статусом «Забронировано», пока подписывается договор.'],
+['Берёте ли вы объекты в управление?','Да. Берём на себя коммерческое и операционное управление: привлекаем арендаторов и обеспечиваем работу инфраструктуры.']];
+const WORK=[['Заявка','Вы оставляете заявку или звоните. Уточняем задачу: площадь, назначение, мощности, бюджет.'],['Подбор','Предлагаем подходящие помещения и показываем объекты.'],['Договор','Согласовываем условия, оформляем аренду или бронь.'],['Заселение','Передаём помещение, подключаем инфраструктуру.'],['Сопровождение','Управляющая компания каждый день обеспечивает работу инфраструктуры.']];
+const SEO={'':['ЦУКОН — управление производственно-коммерческой недвижимостью в Мордовии','Аренда производственных и коммерческих помещений в Мордовии с готовой инфраструктурой. Управление недвижимостью.'],
+objects:['Объекты и свободные помещения — ЦУКОН','Каталог объектов и свободных помещений: площадь, назначение, цена, статус. Карта объектов.'],
+tenants:['Арендаторам — аренда производственных и коммерческих помещений | ЦУКОН','Подберём помещение для вашего бизнеса. Готовая инфраструктура: электричество, газ, охрана, уборка.'],
+owners:['Собственникам — передать объект в управление | ЦУКОН','Превращаем недвижимость в работающий актив: привлекаем арендаторов и управляем объектом.'],
+residents:['Резиденты ЦУКОН — арендаторы на наших объектах','Более 120 арендаторов работают на объектах под управлением ЦУКОН.'],
+about:['О компании ЦУКОН','Управляющая компания в сфере производственно-коммерческой недвижимости в Республике Мордовия.'],
+contacts:['Контакты — ЦУКОН','Телефон, электронная почта, адрес и форма обратной связи ЦУКОН.'],
+privacy:['Политика конфиденциальности — ЦУКОН','Как мы обрабатываем персональные данные.']};
+const RES=['ООО «Пример-1»','ИП Иванов','ООО «Пример-2»','ООО «Пример-3»','ИП Петров','ООО «Пример-4»'];
+const $=s=>document.querySelector(s),rub=n=>n.toLocaleString('ru-RU');
+let F={o:'0',st:'0',u:'0'};
+
+const tag=s=>`<span class="tag ${s}">${ST[s]}</span>`;
+const roomCard=r=>`<button class="card" data-room="${r.id}"><div class="pic"><small>фото</small><b>${r.s} м²</b></div><div class="row"><h3>${r.t}</h3>${tag(r.st)}</div><p class="cap">${PU[r.u]}, ${OBJ.find(o=>o.id==r.o).n}</p><span class="price">${rub(r.p)} ₽/м² в мес.</span></button>`;
+const objRow=o=>{const n=RM.filter(r=>r.o==o.id&&r.st=='free').length;return `<button class="card obox" data-obj="${o.id}"><div class="pic"><small>фото</small><b>${n} своб.</b></div><div class="row"><h3>${o.n}</h3></div><p class="cap">${o.a}</p><span class="price">Смотреть помещения</span><i class="ar"></i></button>`};
+const faq=()=>`<div style="border-top:1px solid var(--line)">${FAQ.map((q,i)=>`<details${i?'':' open'}><summary>${q[0]}</summary><p>${q[1]}</p></details>`).join('')}</div>`;
+const form=type=>{const own=type==='owner';return `<form class="f" data-form="${type}" novalidate>
+<input name="name" placeholder="Имя" required autocomplete="name" aria-label="Имя">
+<input name="phone" type="tel" placeholder="Телефон" required autocomplete="tel" aria-label="Телефон">
+<input name="email" type="email" placeholder="Электронная почта" autocomplete="email" aria-label="Электронная почта">
+${own?`<input name="obj" placeholder="Адрес и тип объекта" aria-label="Адрес и тип объекта"><input name="area" placeholder="Площадь, м²" inputmode="numeric" aria-label="Площадь">`:
+`<select name="purpose" aria-label="Назначение"><option value="">Назначение</option>${Object.values(PU).map(v=>`<option>${v}</option>`).join('')}</select><input name="area" placeholder="Нужная площадь, м²" inputmode="numeric" aria-label="Площадь">`}
+<textarea class="full" name="msg" rows="2" placeholder="Комментарий: мощности, ворота, сроки" aria-label="Комментарий"></textarea>
+<div class="hp" aria-hidden="true"><input name="website" tabindex="-1" autocomplete="off"></div>
+<label class="ck full"><input type="checkbox" name="ok" required> Согласен на обработку персональных данных. <a href="#/privacy" style="text-decoration:underline">Политика конфиденциальности</a></label>
+<div class="full"><button class="btn" type="submit">${own?'Передать объект в управление':'Подобрать помещение'}</button><div class="msg" role="status"></div></div></form>`};
+
+const HERO=()=>{let w='',s='';
+for(let r=0;r<4;r++)for(let c=0;c<4;c++)w+=`<rect class="lt" style="--d:${(2+(r*4+c)*.13).toFixed(2)}s" x="${718+c*34}" y="${178+r*42}" width="16" height="22"/>`;
+for(let i=0;i<3;i++)w+=`<rect class="lt" style="--d:${2.3+i*.3}s" x="${84+i*80}" y="252" width="44" height="26"/>`;
+return `<svg class="hero-svg" viewBox="0 0 1200 400" role="img" aria-label="Схема объекта: здания, электросети, газ, охрана и инженерные системы"><g class="s"><path d="M0 360H1200"/><path d="M60 360V212L140 172V212L220 172V212L300 172V360"/><path d="M400 360V240H640V360M390 240H650"/><path d="M700 360V150H860V360M690 150H870"/><rect x="488" y="296" width="74" height="64"/></g>
+<g data-g="gas"><path d="M0 382H1200"/><path d="M1070 360V322a28 28 0 0 1 56 0V360"/><path d="M330 360V88H360V360"/></g>
+<g data-g="power"><path d="M935 360L968 140L1001 360M948 250H988M956 200H980M968 140V96M938 108H998"/><path d="M938 108Q900 156 860 152"/><path d="M998 108Q1080 150 1170 128"/></g>
+<g data-g="guard"><path d="M18 360V308H72V360M72 328H190"/><path d="M190 322V360"/></g>
+<g data-g="clean"><path d="M250 360V298Q250 286 264 286H280"/><path d="M1020 360V312M1000 332Q1020 296 1040 332"/></g>
+<g data-g="eng"><circle cx="520" cy="212" r="18"/><path d="M520 194V230M502 212H538M600 240V206H620V240"/></g>
+${w}</svg>`};
+
+const P={
+'':()=>`<section class="hero"><div class="w"><h1><span class="m"><span>Недвижимость,</span></span><span class="m"><span>которая</span></span><span class="m"><span>работает.</span></span></h1>
+<div class="lead"><p>ЦУКОН — управляющая компания в сфере производственно-коммерческой недвижимости. Вы занимаетесь бизнесом — мы занимаемся инфраструктурой.</p><div><a class="btn" href="#/objects" data-go="#rooms">Смотреть помещения</a><a class="btn l" href="#/owners" data-go=".fbox">Передать объект</a></div></div>
+<div class="scene">${HERO()}<div class="live"><i></i>Инфраструктура в норме</div></div>
+<div class="inf">${INF.map(i=>`<button data-s="${i[0]}"><h3>${i[1]}</h3><p>${i[2]}</p></button>`).join('')}</div>
+<div class="stats"><div><b data-n="120" data-p="+">120+</b>арендаторов на наших объектах</div><div><b data-n="${OBJ.length}">${OBJ.length}</b>объекта в управлении (демо)</div><div><b data-n="${RM.filter(r=>r.st=='free').length}">${RM.filter(r=>r.st=='free').length}</b>свободных помещений (демо)</div></div></div></section>
+<section><div class="w"><p class="big">Мы не просто сдаём площади. Мы управляем объектом как работающим бизнес-активом. <span>Привлекаем арендаторов, обеспечиваем эксплуатацию и бесперебойную работу инфраструктуры.</span></p></div></section>
+<section style="padding-top:0"><div class="w"><div class="ctr"><h2>Объекты</h2></div><div class="objs">${OBJ.map(objRow).join('')}</div><p class="ctr" style="margin:28px 0 0"><a class="btn l" href="#/objects">Все объекты</a></p></div></section>
+<section style="padding-top:0"><div class="w pan"><a href="#/tenants"><h2>Арендатору</h2><div><p>Не просто квадратные метры, а готовая инфраструктура для работы бизнеса.</p></div></a><a href="#/owners"><h2>Собственнику</h2><div><p>Превращаем недвижимость в работающий актив и берём управление на себя.</p></div></a></div></section>
+<section style="padding-top:0"><div class="w"><div class="proc"><div class="hd"><h2>Как мы работаем</h2><p>От заявки до ежедневного сопровождения.</p></div><div class="sts">${WORK.map((s,i)=>`<div class="st" data-n="${i+1}"><h3>${s[0]}</h3><p>${s[1]}</p></div>`).join('')}</div></div></div></section>
+<section style="padding-top:0"><div class="w"><h2 style="margin-bottom:28px">Частые вопросы</h2>${faq()}</div></section>
+<section style="padding-top:0"><div class="w"><div class="fbox"><h2>Остались вопросы?</h2><p class="mute" style="margin-top:10px">Оставьте заявку — подберём помещение под вашу задачу.</p>${form('tenant')}</div></div></section>`,
+
+objects:()=>{const rs=RM.filter(r=>(F.o=='0'||r.o==F.o)&&(F.st=='0'||r.st==F.st)&&(F.u=='0'||r.u==F.u));
+return `<section class="sub"><div class="w"><h1>Объекты</h1><div class="objs" style="margin-top:36px">${OBJ.map(objRow).join('')}</div></div></section>
+<section style="padding-top:0"><div class="w"><h2 class="ctr">Карта объектов</h2><div class="map" style="margin-top:22px"><svg viewBox="0 0 600 340" role="img" aria-label="Схема расположения объектов"><g fill="none" stroke="currentColor" stroke-opacity=".12" stroke-width="10"><path d="M0 120H600M0 230H600M120 0V340M300 0V340M470 0V340"/></g>${OBJ.map(o=>`<g class="pin" data-obj="${o.id}" tabindex="0" role="button" aria-label="${o.n}"><circle cx="${o.x}" cy="${o.y}" r="17"/><text x="${o.x}" y="${o.y+4}" text-anchor="middle">${o.id}</text></g>`).join('')}</svg></div>
+<p class="cap" style="margin-top:10px">Схема для прототипа. В рабочей версии — интерактивная карта с точными адресами.</p></div></section>
+<section style="padding-top:0" id="rooms"><div class="w"><h2 class="ctr">Помещения</h2>
+<div class="bar"><select data-f="o" aria-label="Объект"><option value="0">Все объекты</option>${OBJ.map(o=>`<option value="${o.id}"${F.o==o.id?' selected':''}>${o.n}</option>`).join('')}</select>
+<select data-f="u" aria-label="Назначение"><option value="0">Любое назначение</option>${Object.entries(PU).map(([k,v])=>`<option value="${k}"${F.u==k?' selected':''}>${v}</option>`).join('')}</select>
+<select data-f="st" aria-label="Статус"><option value="0">Любой статус</option>${Object.entries(ST).map(([k,v])=>`<option value="${k}"${F.st==k?' selected':''}>${v}</option>`).join('')}</select></div>
+<div class="grid">${rs.map(roomCard).join('')||'<p class="mute">Ничего не найдено. Измените фильтры или оставьте заявку — подберём вручную.</p>'}</div></div></section>`},
+
+tenants:()=>`<section class="sub"><div class="w"><h1>Арендаторам</h1><p class="mute" style="margin-top:20px;max-width:56ch">Вы получаете готовую инфраструктуру для работы бизнеса. Электроснабжение, газоснабжение, охрана, доступ на территорию, уборка и инженерные системы — на нашей стороне.</p>
+<div class="fl" style="margin-top:36px"><div><h3>Без простоев из-за инфраструктуры</h3><p class="mute">Бизнес не останавливается из-за инженерных проблем.</p></div><div><h3>Разные форматы</h3><p class="mute">Производство, склады, офисы — под разные задачи.</p></div></div>
+<h2 class="ctr" style="margin-top:64px">Свободные помещения</h2><div class="grid" style="margin-top:22px">${RM.filter(r=>r.st=='free').slice(0,4).map(roomCard).join('')}</div><p style="margin-top:24px;text-align:center"><a class="btn l" href="#/objects">Весь каталог</a></p>
+<div class="fbox" style="margin-top:64px"><h2>Подобрать помещение</h2>${form('tenant')}</div></div></section>`,
+
+owners:()=>`<section class="sub"><div class="w"><h1>Собственникам</h1><p class="mute" style="margin-top:20px;max-width:56ch">Мы превращаем недвижимость в работающий актив. Берём на себя коммерческое и операционное управление объектом, повышаем его эффективность и обеспечиваем ежедневную работу инфраструктуры.</p>
+<div class="fl" style="margin-top:36px"><div><h3>Привлечение арендаторов</h3><p class="mute">Ищем и сопровождаем арендаторов.</p></div><div><h3>Эксплуатация</h3><p class="mute">Инженерные системы, охрана, содержание территории.</p></div></div>
+<div class="fbox" style="margin-top:64px"><h2>Передать объект в управление</h2>${form('owner')}</div></div></section>`,
+
+residents:()=>`<section class="sub"><div class="w"><h1>Резиденты</h1><p class="mute" style="margin-top:20px;max-width:56ch">120+ арендаторов уже работают на объектах под управлением ЦУКОН. Мы создаём рабочую бизнес-среду, где предприниматели сосредоточены на основном деле.</p>
+<div class="grid" style="margin-top:36px">${RES.map(r=>`<div class="fl" style="display:block"><div><h3>${r}</h3><p class="cap" style="margin-top:6px">Описание резидента (демо)</p></div></div>`).join('')}</div></div></section>`,
+
+about:()=>`<section class="sub"><div class="w"><h1>О компании</h1><p class="big" style="margin-top:28px">ЦУКОН — управляющая компания в сфере производственно-коммерческой недвижимости.</p>
+<div class="fl" style="margin-top:44px"><div><h3>Для собственника</h3><p class="mute">Превращаем недвижимость в работающий актив.</p></div><div><h3>Для арендатора</h3><p class="mute">Готовая инфраструктура для работы бизнеса.</p></div><div><h3>Для Мордовии</h3><p class="mute">Помогаем эффективнее использовать существующую недвижимость, сохранять рабочие места и развивать деловую активность.</p></div><div><h3>Наша цель</h3><p class="mute">Стать лидером в управлении производственно-коммерческой недвижимостью в Республике Мордовия.</p></div></div></div></section>`,
+
+contacts:()=>`<section class="sub"><div class="w"><h1>Контакты</h1><div class="fl" style="margin-top:36px"><div><h3>Телефон</h3><p><a href="tel:+70000000000">+7 (000) 000-00-00</a></p><h3 style="margin-top:18px">Электронная почта</h3><p><a href="mailto:info@example.ru">info@example.ru</a></p><h3 style="margin-top:18px">Адрес</h3><p>Республика Мордовия, г. Саранск</p><p class="cap" style="margin-top:12px">Контактные данные временные, заменить на реальные.</p></div><div><h3>Написать нам</h3>${form('tenant')}</div></div></div></section>`,
+
+privacy:()=>`<section class="sub"><div class="w"><h1>Политика конфиденциальности</h1><p class="mute" style="margin-top:20px;max-width:60ch">Текст политики обработки персональных данных будет предоставлен Заказчиком.</p></div></section>`};
+
+function show(r){const o=OBJ.find(x=>x.id==r.o);$('#dlb').innerHTML=`<div class="pic" style="height:170px"><small>фото</small><b style="font-size:40px">${r.s} м²</b></div><div class="row" style="margin-top:6px"><h2 style="font-size:26px">${r.t}</h2>${tag(r.st)}</div><p class="mute">${o.n}, ${o.a}</p>
+<dl><dt>Площадь</dt><dd>${r.s} м²</dd><dt>Назначение</dt><dd>${PU[r.u]}</dd><dt>Цена</dt><dd>${rub(r.p)} ₽/м² в мес. (≈ ${rub(r.p*r.s)} ₽ в мес.)</dd><dt>Характеристики</dt><dd>${r.f.join(', ')}</dd></dl>
+<div class="row"><a class="btn" href="#/tenants" data-go=".fbox" data-room-req="${r.id}" onclick="dlg.close()">Оставить заявку</a><button class="btn l" onclick="dlg.close()">Закрыть</button></div>`;$('#dlg').showModal()}
+
+const RM_=matchMedia('(prefers-reduced-motion:reduce)').matches;
+function cnt(){document.querySelectorAll('[data-n]:not(.st)').forEach(el=>{const t=+el.dataset.n,p=el.dataset.p||'';if(RM_)return;el.textContent='0'+p;const io=new IntersectionObserver(([e])=>{if(!e.isIntersecting)return;io.disconnect();const s=performance.now();(function f(n){const k=Math.min(1,(n-s)/1300);el.textContent=Math.round(t*(1-Math.pow(1-k,3)))+p;if(k<1)requestAnimationFrame(f)})(s)});io.observe(el)})}
+function sc(){const p=$('.proc');if(!p)return;const r=p.getBoundingClientRect(),y=innerHeight*.62;p.style.setProperty('--p',Math.min(1,Math.max(0,(y-r.top-100)/(r.height-100))));p.querySelectorAll('.st').forEach(s=>s.classList.toggle('on',s.getBoundingClientRect().top<y))}
+function hl(s){const v=$('.hero-svg');if(!v)return;v.classList.toggle('dim',!!s);v.querySelectorAll('[data-g]').forEach(g=>g.classList.toggle('hl',g.dataset.g===s))}
+function render(){const h=(location.hash.replace(/^#\/?/,'')||'');const k=P[h]?h:'';$('#app').innerHTML=P[k]();
+document.title=SEO[k][0];document.querySelector('meta[name=description]').content=SEO[k][1];
+document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#/'+k||(k===''&&a.getAttribute('href')==='#/')));
+$('#nav').classList.remove('open');$('#bg').setAttribute('aria-expanded','false');window.scrollTo(0,0);window._t=Date.now();
+document.querySelectorAll('.hero-svg path,.hero-svg circle,.hero-svg rect:not(.lt)').forEach((e,i)=>{e.setAttribute('pathLength',1);e.style.animationDelay=(.15+i*.05)+'s'});
+cnt();sc();if(window._go){const t=window._go;window._go=null;setTimeout(()=>{const el=$(t);if(el){el.scrollIntoView({behavior:'smooth',block:'start'});const ta=window._pre&&el.querySelector('textarea');if(ta)ta.value=window._pre}window._pre=null},80)}}
+addEventListener('hashchange',()=>{if(!window._k)F={o:'0',st:'0',u:'0'};window._k=0;render()});
+addEventListener('scroll',sc,{passive:true});
+document.addEventListener('mouseover',e=>hl(e.target.closest('[data-s]')?.dataset.s));
+document.addEventListener('focusin',e=>hl(e.target.closest?.('[data-s]')?.dataset.s));
+document.addEventListener('click',e=>{
+const r=e.target.closest('[data-room]');if(r)return show(RM.find(x=>x.id==r.dataset.room));
+const o=e.target.closest('[data-obj]');if(o){F.o=o.dataset.obj;F.st='0';F.u='0';window._go='#rooms';if(location.hash!=='#/objects'){window._k=1;location.hash='#/objects'}else render();return}
+const g=e.target.closest('[data-go]');if(g){window._go=g.dataset.go;const q=g.dataset.roomReq;if(q){const r=RM.find(x=>x.id==q);window._pre='Интересует: '+r.t+', '+OBJ.find(x=>x.id==r.o).n+', '+r.s+' м²'}if(location.hash===g.getAttribute('href')){e.preventDefault();render()}}});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.classList?.contains('pin'))e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}))});
+document.addEventListener('change',e=>{const f=e.target.dataset.f;if(f){F[f]=e.target.value;const y=scrollY;render();scrollTo(0,y)}});
+$('#bg').onclick=()=>{const o=$('#nav').classList.toggle('open');$('#bg').setAttribute('aria-expanded',o)};
+document.addEventListener('submit',e=>{e.preventDefault();const f=e.target,m=f.querySelector('.msg'),d=new FormData(f);m.style.display='block';
+if(d.get('website')||Date.now()-window._t<3000){m.textContent='Не удалось отправить. Попробуйте ещё раз.';return}
+if(!d.get('name')||!d.get('phone')){m.textContent='Укажите имя и телефон.';return}
+if(!d.get('ok')){m.textContent='Подтвердите согласие на обработку персональных данных.';return}
+// В рабочей версии: POST на сервер → письмо на почту Заказчика + капча (Яндекс SmartCaptcha).
+m.textContent='Заявка отправлена. Мы свяжемся с вами в ближайшее время. (Демо: письмо не отправляется.)';f.reset()});
+render();
+</script>
+</body>
+</html>

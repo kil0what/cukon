@@ -6,10 +6,46 @@ export interface CmsBootstrapResponse {
   smtpConfigured: boolean;
 }
 
+export async function parseApiJson<T>(res: Response, fallbackError: string): Promise<T & { error?: string }> {
+  const text = await res.text();
+  const trimmed = text.trim();
+  const contentType = (res.headers.get('content-type') || '').toLowerCase();
+
+  if (!trimmed) {
+    if (!res.ok) {
+      throw new Error(`${fallbackError} (HTTP ${res.status})`);
+    }
+    return {} as T & { error?: string };
+  }
+
+  if (trimmed.startsWith('<') || contentType.includes('text/html')) {
+    const looksLikeSpaShell =
+      /<!doctype\s+html/i.test(trimmed) && (trimmed.includes('id="root"') || trimmed.includes('ЦУКОН'));
+    if (looksLikeSpaShell) {
+      throw new Error(
+        'Сервер CMS (/api) недоступен по этому адресу: открыта статическая копия сайта (например, ссылка предпросмотра Share или папка без PHP/.htaccess). Для входа в CMS используйте панель разработки или загрузите пакет Beget (.zip) целиком в корень public_html.',
+      );
+    }
+    throw new Error(
+      `Сервер вернул HTML вместо ответа API (HTTP ${res.status}). Проверьте работу бэкенда CMS (Node.js или PHP api.php + .htaccess) и авторизацию в окне предпросмотра.`,
+    );
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(trimmed);
+  } catch {
+    throw new Error(`${fallbackError} (некорректный ответ сервера HTTP ${res.status})`);
+  }
+
+  return (parsed && typeof parsed === 'object' ? parsed : {}) as T & { error?: string };
+}
+
 export async function fetchCmsBootstrap(): Promise<CmsBootstrapResponse> {
   const res = await fetch('/api/cms');
-  if (!res.ok) throw new Error('Не удалось загрузить данные сайта');
-  return (await res.json()) as CmsBootstrapResponse;
+  const data = await parseApiJson<CmsBootstrapResponse>(res, 'Не удалось загрузить данные сайта');
+  if (!res.ok || !data.state) throw new Error(data.error || 'Не удалось загрузить данные сайта');
+  return data;
 }
 
 export async function loginAdmin(password: string): Promise<string> {
@@ -18,7 +54,7 @@ export async function loginAdmin(password: string): Promise<string> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ password }),
   });
-  const data = (await res.json()) as { token?: string; error?: string };
+  const data = await parseApiJson<{ token?: string }>(res, 'Ошибка авторизации');
   if (!res.ok || !data.token) {
     throw new Error(data.error || 'Ошибка авторизации');
   }
@@ -34,7 +70,7 @@ export async function updateAdminPassword(token: string, newPassword: string): P
     },
     body: JSON.stringify({ newPassword }),
   });
-  const data = (await res.json()) as { ok?: boolean; error?: string };
+  const data = await parseApiJson<{ ok?: boolean }>(res, 'Не удалось сменить пароль');
   if (!res.ok) throw new Error(data.error || 'Не удалось сменить пароль');
 }
 
@@ -47,7 +83,7 @@ export async function saveCmsState(token: string, state: CmsState): Promise<CmsS
     },
     body: JSON.stringify({ state }),
   });
-  const data = (await res.json()) as { state?: CmsState; error?: string };
+  const data = await parseApiJson<{ state?: CmsState }>(res, 'Не удалось сохранить изменения');
   if (!res.ok || !data.state) throw new Error(data.error || 'Не удалось сохранить изменения');
   return data.state;
 }
@@ -57,7 +93,7 @@ export async function resetCmsState(token: string): Promise<CmsState> {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` },
   });
-  const data = (await res.json()) as { state?: CmsState; error?: string };
+  const data = await parseApiJson<{ state?: CmsState }>(res, 'Не удалось сбросить данные');
   if (!res.ok || !data.state) throw new Error(data.error || 'Не удалось сбросить данные');
   return data.state;
 }
@@ -81,11 +117,10 @@ export async function submitLead(payload: {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
-  const data = (await res.json()) as {
+  const data = await parseApiJson<{
     ok?: boolean;
     lead?: Pick<LeadSubmission, 'id' | 'createdAt' | 'status'>;
-    error?: string;
-  };
+  }>(res, 'Ошибка отправки заявки');
   if (!res.ok || !data.ok || !data.lead) {
     throw new Error(data.error || 'Ошибка отправки заявки');
   }
@@ -96,7 +131,7 @@ export async function fetchLeads(token: string): Promise<LeadSubmission[]> {
   const res = await fetch('/api/leads', {
     headers: { Authorization: `Bearer ${token}` },
   });
-  const data = (await res.json()) as { leads?: LeadSubmission[]; error?: string };
+  const data = await parseApiJson<{ leads?: LeadSubmission[] }>(res, 'Ошибка загрузки заявок');
   if (!res.ok) throw new Error(data.error || 'Ошибка загрузки заявок');
   return data.leads || [];
 }
@@ -114,7 +149,7 @@ export async function updateLeadStatus(
     },
     body: JSON.stringify({ status }),
   });
-  const data = (await res.json()) as { lead?: LeadSubmission; error?: string };
+  const data = await parseApiJson<{ lead?: LeadSubmission }>(res, 'Ошибка обновления статуса');
   if (!res.ok || !data.lead) throw new Error(data.error || 'Ошибка обновления статуса');
   return data.lead;
 }
@@ -124,7 +159,8 @@ export async function deleteLead(token: string, id: string): Promise<void> {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw new Error('Ошибка удаления заявки');
+  const data = await parseApiJson<{ ok?: boolean }>(res, 'Ошибка удаления заявки');
+  if (!res.ok) throw new Error(data.error || 'Ошибка удаления заявки');
 }
 
 export async function postAnalyticsEvent(payload: {
@@ -150,11 +186,10 @@ export async function fetchAnalyticsStats(token: string): Promise<{
   const res = await fetch('/api/analytics/stats', {
     headers: { Authorization: `Bearer ${token}` },
   });
-  const data = (await res.json()) as {
+  const data = await parseApiJson<{
     events?: AnalyticsEventLog[];
     counts?: Record<string, number>;
-    error?: string;
-  };
+  }>(res, 'Ошибка загрузки статистики');
   if (!res.ok) throw new Error(data.error || 'Ошибка загрузки статистики');
   return { events: data.events || [], counts: data.counts || {} };
 }
@@ -168,7 +203,7 @@ export async function testWordPressSync(token: string, siteUrl: string): Promise
     },
     body: JSON.stringify({ siteUrl }),
   });
-  const data = (await res.json()) as { wordpress?: WordPressSettings; error?: string };
+  const data = await parseApiJson<{ wordpress?: WordPressSettings }>(res, 'Не удалось подключиться к WordPress');
   if (!res.ok || !data.wordpress) throw new Error(data.error || 'Не удалось подключиться к WordPress');
   return data.wordpress;
 }

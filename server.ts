@@ -511,6 +511,11 @@ async function startServer(): Promise<void> {
     }
   });
 
+  // Never fall back to index.html for unknown /api/* endpoints
+  app.use('/api', (_req, res) => {
+    res.status(404).json({ error: 'Маршрут API не найден' });
+  });
+
   // Vite / Static frontend serving
   if (process.env.NODE_ENV === 'production') {
     const distPath = path.resolve(process.cwd(), 'dist');

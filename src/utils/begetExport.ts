@@ -19,7 +19,6 @@ export function buildBegetPackageFiles(
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteBase /
 
   # Передача заголовка Authorization в PHP на Apache/Beget
   RewriteCond %{HTTP:Authorization} .
@@ -36,7 +35,7 @@ export function buildBegetPackageFiles(
   # Статика и SPA
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule . /index.html [L]
+  RewriteRule . index.html [L]
 </IfModule>
 `;
 
@@ -124,7 +123,7 @@ function tsukon_verify_password(string $pwd, string $storedHash): array {
     if ($storedHash === '') {
         return ['valid' => false, 'upgrade' => false];
     }
-    if (str_starts_with($storedHash, 'pbkdf2_sha256$')) {
+    if (strncmp($storedHash, 'pbkdf2_sha256$', 14) === 0) {
         $parts = explode('$', $storedHash);
         if (count($parts) !== 3 || $parts[1] === '' || $parts[2] === '') {
             return ['valid' => false, 'upgrade' => false];
@@ -252,7 +251,7 @@ if ($route === 'sitemap.xml' && $method === 'GET') {
     $urls = '';
     foreach ($slugs as $s) {
         $loc = $s === '' ? $base . '/' : $base . '/#/' . $s;
-        $prio = ($s === '' || $s === 'objects' || $s === 'faq' || str_starts_with($s, 'guide-')) ? '0.9' : '0.7';
+        $prio = ($s === '' || $s === 'objects' || $s === 'faq' || strncmp($s, 'guide-', 6) === 0) ? '0.9' : '0.7';
         $urls .= "  <url><loc>" . htmlspecialchars($loc, ENT_XML1) . "</loc><changefreq>weekly</changefreq><priority>{$prio}</priority></url>\\n";
     }
     echo "<?xml version=\\"1.0\\" encoding=\\"UTF-8\\"?>\\n<urlset xmlns=\\"http://www.sitemaps.org/schemas/sitemap/0.9\\">\\n{$urls}</urlset>";

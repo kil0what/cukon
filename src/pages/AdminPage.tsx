@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   Building2,
   Check,
+  Copy,
   FileText,
   Globe,
   HelpCircle,
@@ -79,6 +80,8 @@ export function AdminPage({
   const [draft, setDraft] = useState<CmsState>(() => structuredClone(state));
   const [saving, setSaving] = useState(false);
   const [saveNotice, setSaveNotice] = useState<string | null>(null);
+  const [roomSearch, setRoomSearch] = useState('');
+  const [roomStatusFilter, setRoomStatusFilter] = useState<'all' | RoomStatus>('all');
 
   const [leads, setLeads] = useState<LeadSubmission[]>([]);
   const [analyticsStats, setAnalyticsStats] = useState<{
@@ -241,6 +244,14 @@ export function AdminPage({
     setDraft((prev) => ({ ...prev, objects: [...prev.objects, nextObj] }));
   };
 
+  const duplicateObject = (obj: PropertyObject) => {
+    const nextId = Math.max(0, ...draft.objects.map((o) => o.id)) + 1;
+    setDraft((prev) => ({
+      ...prev,
+      objects: [...prev.objects, { ...obj, id: nextId, name: `${obj.name} (копия)` }],
+    }));
+  };
+
   const addRoom = () => {
     const nextId = Math.max(0, ...draft.rooms.map((r) => r.id)) + 1;
     const defaultObjId = draft.objects[0]?.id || 1;
@@ -258,6 +269,14 @@ export function AdminPage({
       featuredOnStart: true,
     };
     setDraft((prev) => ({ ...prev, rooms: [nextRoom, ...prev.rooms] }));
+  };
+
+  const duplicateRoom = (room: RoomItem) => {
+    const nextId = Math.max(0, ...draft.rooms.map((r) => r.id)) + 1;
+    setDraft((prev) => ({
+      ...prev,
+      rooms: [{ ...room, id: nextId, title: `${room.title} (копия)`, features: [...room.features] }, ...prev.rooms],
+    }));
   };
 
   const addResident = () => {
@@ -410,20 +429,38 @@ export function AdminPage({
                         key={obj.id}
                         className="py-4 first:pt-0 last:pb-0 space-y-3"
                       >
-                        <div className="flex items-center justify-between gap-2">
-                          <strong className="text-sm">Объект № {obj.id}</strong>
-                          <button
-                            type="button"
-                            className="text-xs text-red-700 inline-flex items-center gap-1 cursor-pointer"
-                            onClick={() =>
-                              setDraft((prev) => ({
-                                ...prev,
-                                objects: prev.objects.filter((o) => o.id !== obj.id),
-                              }))
-                            }
-                          >
-                            <Trash2 size={13} /> Удалить
-                          </button>
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="flex items-center gap-3">
+                            {obj.image && (
+                              <img
+                                src={obj.image}
+                                alt={obj.name}
+                                className="w-12 h-9 rounded-lg object-cover border border-[var(--line)] shrink-0"
+                              />
+                            )}
+                            <strong className="text-sm">Объект № {obj.id}</strong>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <button
+                              type="button"
+                              className="text-xs mute hover:text-[var(--ink)] inline-flex items-center gap-1 cursor-pointer"
+                              onClick={() => duplicateObject(obj)}
+                            >
+                              <Copy size={13} /> Дублировать
+                            </button>
+                            <button
+                              type="button"
+                              className="text-xs text-red-700 inline-flex items-center gap-1 cursor-pointer"
+                              onClick={() =>
+                                setDraft((prev) => ({
+                                  ...prev,
+                                  objects: prev.objects.filter((o) => o.id !== obj.id),
+                                }))
+                              }
+                            >
+                              <Trash2 size={13} /> Удалить
+                            </button>
+                          </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
@@ -466,31 +503,114 @@ export function AdminPage({
                                 return { ...prev, objects: next };
                               });
                             }}
-                            placeholder="Коммуникации"
+                            placeholder="Коммуникации (кВт, газ, отопление)"
                             className="rounded-lg border border-[var(--line)] bg-[var(--bg)] px-3 py-2"
                           />
-                          <select
-                            aria-label="Фотография объекта"
-                            value={IMAGE_PRESETS.some((p) => p.value === obj.image) ? obj.image : ''}
+                          <input
+                            aria-label="Охрана и доступ"
+                            value={obj.security}
                             onChange={(e) => {
-                              if (!e.target.value) return;
                               const val = e.target.value;
                               setDraft((prev) => {
                                 const next = [...prev.objects];
-                                next[idx] = { ...next[idx], image: val };
+                                next[idx] = { ...next[idx], security: val };
                                 return { ...prev, objects: next };
                               });
                             }}
+                            placeholder="Охрана и доступ"
                             className="rounded-lg border border-[var(--line)] bg-[var(--bg)] px-3 py-2"
-                          >
-                            <option value="">Своя фотография</option>
-                            {IMAGE_PRESETS.map((p) => (
-                              <option key={p.value} value={p.value}>
-                                Фото: {p.label}
-                              </option>
-                            ))}
-                          </select>
+                          />
+                          <div className="flex gap-1.5 items-center">
+                            <select
+                              aria-label="Фотография объекта"
+                              value={IMAGE_PRESETS.some((p) => p.value === obj.image) ? obj.image : ''}
+                              onChange={(e) => {
+                                if (!e.target.value) return;
+                                const val = e.target.value;
+                                setDraft((prev) => {
+                                  const next = [...prev.objects];
+                                  next[idx] = { ...next[idx], image: val };
+                                  return { ...prev, objects: next };
+                                });
+                              }}
+                              className="flex-1 rounded-lg border border-[var(--line)] bg-[var(--bg)] px-2.5 py-2 text-xs"
+                            >
+                              <option value="">Загруженное / своё фото</option>
+                              {IMAGE_PRESETS.map((p) => (
+                                <option key={p.value} value={p.value}>
+                                  Фото: {p.label}
+                                </option>
+                              ))}
+                            </select>
+                            <label className="text-xs px-2.5 py-2 rounded-lg border border-[var(--line)] bg-[var(--bg)] cursor-pointer shrink-0">
+                              Файл
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (!file) return;
+                                  handleFileToDataUrl(file, (url) => {
+                                    setDraft((prev) => {
+                                      const next = [...prev.objects];
+                                      next[idx] = { ...next[idx], image: url };
+                                      return { ...prev, objects: next };
+                                    });
+                                  });
+                                }}
+                              />
+                            </label>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <input
+                              aria-label="Позиция на схеме X"
+                              type="number"
+                              value={obj.x}
+                              onChange={(e) => {
+                                const val = Number(e.target.value) || 0;
+                                setDraft((prev) => {
+                                  const next = [...prev.objects];
+                                  next[idx] = { ...next[idx], x: val };
+                                  return { ...prev, objects: next };
+                                });
+                              }}
+                              placeholder="X на схеме"
+                              className="rounded-lg border border-[var(--line)] bg-[var(--bg)] px-3 py-2 tabular text-xs"
+                            />
+                            <input
+                              aria-label="Позиция на схеме Y"
+                              type="number"
+                              value={obj.y}
+                              onChange={(e) => {
+                                const val = Number(e.target.value) || 0;
+                                setDraft((prev) => {
+                                  const next = [...prev.objects];
+                                  next[idx] = { ...next[idx], y: val };
+                                  return { ...prev, objects: next };
+                                });
+                              }}
+                              placeholder="Y на схеме"
+                              className="rounded-lg border border-[var(--line)] bg-[var(--bg)] px-3 py-2 tabular text-xs"
+                            />
+                          </div>
                         </div>
+
+                        <textarea
+                          rows={2}
+                          aria-label="Описание объекта"
+                          value={obj.description}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setDraft((prev) => {
+                              const next = [...prev.objects];
+                              next[idx] = { ...next[idx], description: val };
+                              return { ...prev, objects: next };
+                            });
+                          }}
+                          placeholder="Подробное описание площадки"
+                          className="w-full rounded-lg border border-[var(--line)] bg-[var(--bg)] px-3 py-2 text-sm"
+                        />
                       </div>
                     ))}
                   </div>
@@ -498,24 +618,62 @@ export function AdminPage({
 
                 {/* Rooms Editor */}
                 <div className="rounded-2xl bg-[var(--card)] border border-[var(--line)] p-5">
-                  <div className="flex items-center justify-between gap-3 mb-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                     <h2 className="c3-h3" style={{ fontSize: 18 }}>
                       Помещения ({draft.rooms.length})
                     </h2>
-                    <button type="button" className="c3-btn" onClick={addRoom}>
-                      <Plus size={15} />
-                      <span>Добавить помещение</span>
-                    </button>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <input
+                        type="search"
+                        value={roomSearch}
+                        onChange={(e) => setRoomSearch(e.target.value)}
+                        placeholder="Поиск по названию…"
+                        className="rounded-lg border border-[var(--line)] bg-[var(--bg)] px-3 py-1.5 text-xs"
+                      />
+                      <select
+                        aria-label="Фильтр по статусу"
+                        value={roomStatusFilter}
+                        onChange={(e) => setRoomStatusFilter(e.target.value as 'all' | RoomStatus)}
+                        className="rounded-lg border border-[var(--line)] bg-[var(--bg)] px-2.5 py-1.5 text-xs"
+                      >
+                        <option value="all">Все статусы</option>
+                        {Object.entries(ROOM_STATUS_LABELS).map(([k, v]) => (
+                          <option key={k} value={k}>
+                            {v}
+                          </option>
+                        ))}
+                      </select>
+                      <button type="button" className="c3-btn" onClick={addRoom}>
+                        <Plus size={15} />
+                        <span>Добавить помещение</span>
+                      </button>
+                    </div>
                   </div>
 
                   <div className="divide-y divide-[var(--line)]">
-                    {draft.rooms.map((room, idx) => (
+                    {draft.rooms
+                      .map((room, idx) => ({ room, idx }))
+                      .filter(({ room }) => {
+                        if (roomStatusFilter !== 'all' && room.status !== roomStatusFilter) return false;
+                        if (roomSearch.trim()) {
+                          return room.title.toLowerCase().includes(roomSearch.trim().toLowerCase());
+                        }
+                        return true;
+                      })
+                      .map(({ room, idx }) => (
                       <div
                         key={room.id}
                         className="py-4 first:pt-0 last:pb-0 space-y-3"
                       >
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <div className="flex items-center gap-3">
+                            {room.image && (
+                              <img
+                                src={room.image}
+                                alt={room.title}
+                                className="w-11 h-8 rounded object-cover border border-[var(--line)] shrink-0"
+                              />
+                            )}
                             <strong className="text-sm">#{room.id}</strong>
                             <label className="text-xs inline-flex items-center gap-1.5 cursor-pointer">
                               <input
@@ -533,18 +691,27 @@ export function AdminPage({
                               Показывать на старте
                             </label>
                           </div>
-                          <button
-                            type="button"
-                            className="text-xs text-red-700 inline-flex items-center gap-1 cursor-pointer"
-                            onClick={() =>
-                              setDraft((prev) => ({
-                                ...prev,
-                                rooms: prev.rooms.filter((r) => r.id !== room.id),
-                              }))
-                            }
-                          >
-                            <Trash2 size={13} /> Удалить
-                          </button>
+                          <div className="flex items-center gap-3">
+                            <button
+                              type="button"
+                              className="text-xs mute hover:text-[var(--ink)] inline-flex items-center gap-1 cursor-pointer"
+                              onClick={() => duplicateRoom(room)}
+                            >
+                              <Copy size={13} /> Дублировать
+                            </button>
+                            <button
+                              type="button"
+                              className="text-xs text-red-700 inline-flex items-center gap-1 cursor-pointer"
+                              onClick={() =>
+                                setDraft((prev) => ({
+                                  ...prev,
+                                  rooms: prev.rooms.filter((r) => r.id !== room.id),
+                                }))
+                              }
+                            >
+                              <Trash2 size={13} /> Удалить
+                            </button>
+                          </div>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
@@ -697,23 +864,39 @@ export function AdminPage({
                           </div>
                         </div>
 
-                        <input
-                          aria-label="Характеристики через запятую"
-                          value={room.features.join(', ')}
-                          onChange={(e) => {
-                            const feats = e.target.value
-                              .split(',')
-                              .map((s) => s.trim())
-                              .filter(Boolean);
-                            setDraft((prev) => {
-                              const next = [...prev.rooms];
-                              next[idx] = { ...next[idx], features: feats };
-                              return { ...prev, rooms: next };
-                            });
-                          }}
-                          placeholder="Характеристики (через запятую)"
-                          className="w-full rounded-lg border border-[var(--line)] bg-[var(--bg)] px-3 py-2 text-sm"
-                        />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                          <input
+                            aria-label="Характеристики через запятую"
+                            value={room.features.join(', ')}
+                            onChange={(e) => {
+                              const feats = e.target.value
+                                .split(',')
+                                .map((s) => s.trim())
+                                .filter(Boolean);
+                              setDraft((prev) => {
+                                const next = [...prev.rooms];
+                                next[idx] = { ...next[idx], features: feats };
+                                return { ...prev, rooms: next };
+                              });
+                            }}
+                            placeholder="Характеристики (через запятую)"
+                            className="w-full rounded-lg border border-[var(--line)] bg-[var(--bg)] px-3 py-2 text-sm"
+                          />
+                          <input
+                            aria-label="Условия аренды"
+                            value={room.leaseTerms}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setDraft((prev) => {
+                                const next = [...prev.rooms];
+                                next[idx] = { ...next[idx], leaseTerms: val };
+                                return { ...prev, rooms: next };
+                              });
+                            }}
+                            placeholder="Условия аренды (договор, депозит, коммуналка)"
+                            className="w-full rounded-lg border border-[var(--line)] bg-[var(--bg)] px-3 py-2 text-sm"
+                          />
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -722,37 +905,212 @@ export function AdminPage({
             )}
 
             {activeTab === 'pages' && (
-              <div className="rounded-2xl bg-[var(--card)] border border-[var(--line)] p-6 space-y-4">
-                <h2 className="c3-h3" style={{ fontSize: 18 }}>
-                  Редактирование текстов страниц
-                </h2>
-                {(
-                  [
-                    ['homeHeroLead', 'Главная — лид-текст под заголовком'],
-                    ['homeManifestoLead', 'Главная — главный тезис'],
-                    ['homeManifestoSub', 'Главная — подзаголовок тезиса'],
-                    ['tenantsIntro', 'Арендаторам — вступительный текст'],
-                    ['ownersIntro', 'Собственникам — вступительный текст'],
-                    ['residentsIntro', 'Резиденты — вступительный текст'],
-                    ['aboutStatement', 'О компании — ключевое описание'],
-                    ['privacyText', 'Политика конфиденциальности'],
-                  ] as const
-                ).map(([key, label]) => (
-                  <div key={key}>
-                    <label className="block text-xs mute mb-1">{label}</label>
-                    <textarea
-                      rows={key === 'privacyText' ? 4 : 2}
-                      value={draft.pages[key]}
-                      onChange={(e) =>
-                        setDraft((prev) => ({
-                          ...prev,
-                          pages: { ...prev.pages, [key]: e.target.value },
-                        }))
-                      }
-                      className="w-full rounded-xl border border-[var(--line)] bg-[var(--bg)] px-3.5 py-2.5 text-sm"
-                    />
+              <div className="space-y-6">
+                {/* Appearance & Home Sections */}
+                <div className="rounded-2xl bg-[var(--card)] border border-[var(--line)] p-6 space-y-4">
+                  <h2 className="c3-h3" style={{ fontSize: 18 }}>
+                    Внешний вид, заголовок и секции Главной
+                  </h2>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                    <div>
+                      <label className="block text-xs mute mb-1">Строка H1 № 1</label>
+                      <input
+                        value={draft.pages.homeHeroTitle1}
+                        onChange={(e) =>
+                          setDraft((prev) => ({
+                            ...prev,
+                            pages: { ...prev.pages, homeHeroTitle1: e.target.value },
+                          }))
+                        }
+                        className="w-full rounded-xl border border-[var(--line)] bg-[var(--bg)] px-3 py-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs mute mb-1">Строка H1 № 2</label>
+                      <input
+                        value={draft.pages.homeHeroTitle2}
+                        onChange={(e) =>
+                          setDraft((prev) => ({
+                            ...prev,
+                            pages: { ...prev.pages, homeHeroTitle2: e.target.value },
+                          }))
+                        }
+                        className="w-full rounded-xl border border-[var(--line)] bg-[var(--bg)] px-3 py-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs mute mb-1">Строка H1 № 3 (акцент)</label>
+                      <input
+                        value={draft.pages.homeHeroTitle3}
+                        onChange={(e) =>
+                          setDraft((prev) => ({
+                            ...prev,
+                            pages: { ...prev.pages, homeHeroTitle3: e.target.value },
+                          }))
+                        }
+                        className="w-full rounded-xl border border-[var(--line)] bg-[var(--bg)] px-3 py-2"
+                      />
+                    </div>
                   </div>
-                ))}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                    <div>
+                      <label className="block text-xs mute mb-1">Цифра резидентов в статистике (напр. 120+)</label>
+                      <input
+                        value={draft.settings.tenantsTotalCount}
+                        onChange={(e) =>
+                          setDraft((prev) => ({
+                            ...prev,
+                            settings: { ...prev.settings, tenantsTotalCount: e.target.value },
+                          }))
+                        }
+                        className="w-full rounded-xl border border-[var(--line)] bg-[var(--bg)] px-3.5 py-2 text-sm tabular"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs mute mb-1">Акцентный цвет сайта</label>
+                      <div className="flex items-center gap-2.5">
+                        <input
+                          type="color"
+                          aria-label="Акцентный цвет"
+                          value={draft.settings.theme?.accentColor || '#2447ff'}
+                          onChange={(e) =>
+                            setDraft((prev) => ({
+                              ...prev,
+                              settings: {
+                                ...prev.settings,
+                                theme: { ...prev.settings.theme, accentColor: e.target.value },
+                              },
+                            }))
+                          }
+                          className="h-10 w-14 rounded-lg border border-[var(--line)] bg-[var(--bg)] cursor-pointer"
+                        />
+                        <span className="text-xs font-mono mute">
+                          {draft.settings.theme?.accentColor || '#2447ff'}
+                        </span>
+                        <button
+                          type="button"
+                          className="text-xs underline mute cursor-pointer ml-auto"
+                          onClick={() =>
+                            setDraft((prev) => ({
+                              ...prev,
+                              settings: {
+                                ...prev.settings,
+                                theme: { ...prev.settings.theme, accentColor: '#2447ff' },
+                              },
+                            }))
+                          }
+                        >
+                          Сбросить
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-5 pt-3 border-t border-[var(--line)] text-sm">
+                    {(
+                      [
+                        ['showInfraOnHome', 'Показывать блок «Инфраструктура» на Главной'],
+                        ['showProcessOnHome', 'Показывать «Как мы работаем» на Главной'],
+                        ['showFaqOnHome', 'Показывать FAQ на Главной'],
+                        ['showLeadFormOnHome', 'Показывать форму заявки на Главной'],
+                      ] as const
+                    ).map(([key, label]) => (
+                      <label key={key} className="inline-flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={draft.settings.theme?.[key] !== false}
+                          onChange={(e) =>
+                            setDraft((prev) => ({
+                              ...prev,
+                              settings: {
+                                ...prev.settings,
+                                theme: { ...prev.settings.theme, [key]: e.target.checked },
+                              },
+                            }))
+                          }
+                        />
+                        <span>{label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Main Page Texts */}
+                <div className="rounded-2xl bg-[var(--card)] border border-[var(--line)] p-6 space-y-4">
+                  <h2 className="c3-h3" style={{ fontSize: 18 }}>
+                    Редактирование текстов страниц
+                  </h2>
+                  {(
+                    [
+                      ['homeHeroLead', 'Главная — лид-текст под заголовком'],
+                      ['homeManifestoLead', 'Главная — главный тезис'],
+                      ['homeManifestoSub', 'Главная — подзаголовок тезиса'],
+                      ['tenantsIntro', 'Арендаторам — вступительный текст'],
+                      ['ownersIntro', 'Собственникам — вступительный текст'],
+                      ['residentsIntro', 'Резиденты — вступительный текст'],
+                      ['aboutStatement', 'О компании — ключевое описание'],
+                      ['privacyText', 'Политика конфиденциальности (краткая сводка)'],
+                    ] as const
+                  ).map(([key, label]) => (
+                    <div key={key}>
+                      <label className="block text-xs mute mb-1">{label}</label>
+                      <textarea
+                        rows={key === 'privacyText' ? 4 : 2}
+                        value={draft.pages[key]}
+                        onChange={(e) =>
+                          setDraft((prev) => ({
+                            ...prev,
+                            pages: { ...prev.pages, [key]: e.target.value },
+                          }))
+                        }
+                        className="w-full rounded-xl border border-[var(--line)] bg-[var(--bg)] px-3.5 py-2.5 text-sm"
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Info Blocks Editor */}
+                <div className="rounded-2xl bg-[var(--card)] border border-[var(--line)] p-6 space-y-4">
+                  <h2 className="c3-h3" style={{ fontSize: 18 }}>
+                    Справочные ИИ-блоки (карточки условий и коммуникаций)
+                  </h2>
+                  <div className="space-y-3">
+                    {draft.infoBlocks.map((block, idx) => (
+                      <div key={block.id} className="rounded-xl bg-[var(--bg)] border border-[var(--line)] p-4 space-y-2">
+                        <input
+                          aria-label="Заголовок блока"
+                          value={block.title}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setDraft((prev) => {
+                              const next = [...prev.infoBlocks];
+                              next[idx] = { ...next[idx], title: val };
+                              return { ...prev, infoBlocks: next };
+                            });
+                          }}
+                          className="w-full rounded-lg border border-[var(--line)] bg-[var(--card)] px-3 py-2 text-sm font-medium"
+                        />
+                        <textarea
+                          rows={2}
+                          aria-label="Описание блока"
+                          value={block.summary}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setDraft((prev) => {
+                              const next = [...prev.infoBlocks];
+                              next[idx] = { ...next[idx], summary: val };
+                              return { ...prev, infoBlocks: next };
+                            });
+                          }}
+                          className="w-full rounded-lg border border-[var(--line)] bg-[var(--card)] px-3 py-2 text-sm"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 
@@ -813,62 +1171,100 @@ export function AdminPage({
                     {draft.residents.map((res, idx) => (
                       <div
                         key={res.id}
-                        className="rounded-xl bg-[var(--bg)] border border-[var(--line)] p-4 grid grid-cols-1 md:grid-cols-3 gap-3 text-sm"
+                        className="rounded-xl bg-[var(--bg)] border border-[var(--line)] p-4 space-y-2.5 text-sm"
                       >
-                        <input
-                          aria-label="Название резидента"
-                          value={res.name}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setDraft((prev) => {
-                              const next = [...prev.residents];
-                              next[idx] = { ...next[idx], name: val };
-                              return { ...prev, residents: next };
-                            });
-                          }}
-                          className="rounded-lg border border-[var(--line)] bg-[var(--card)] px-3 py-2"
-                        />
-                        <input
-                          aria-label="Отрасль"
-                          value={res.industry}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setDraft((prev) => {
-                              const next = [...prev.residents];
-                              next[idx] = { ...next[idx], industry: val };
-                              return { ...prev, residents: next };
-                            });
-                          }}
-                          className="rounded-lg border border-[var(--line)] bg-[var(--card)] px-3 py-2"
-                        />
-                        <div className="flex gap-2">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                           <input
-                            aria-label="Описание"
-                            value={res.description}
+                            aria-label="Название резидента"
+                            value={res.name}
                             onChange={(e) => {
                               const val = e.target.value;
                               setDraft((prev) => {
                                 const next = [...prev.residents];
-                                next[idx] = { ...next[idx], description: val };
+                                next[idx] = { ...next[idx], name: val };
                                 return { ...prev, residents: next };
                               });
                             }}
-                            className="flex-1 rounded-lg border border-[var(--line)] bg-[var(--card)] px-3 py-2"
+                            placeholder="Компания"
+                            className="rounded-lg border border-[var(--line)] bg-[var(--card)] px-3 py-2"
                           />
-                          <button
-                            type="button"
-                            className="text-red-700 px-2 cursor-pointer"
-                            aria-label="Удалить резидента"
-                            onClick={() =>
-                              setDraft((prev) => ({
-                                ...prev,
-                                residents: prev.residents.filter((r) => r.id !== res.id),
-                              }))
-                            }
+                          <input
+                            aria-label="Отрасль"
+                            value={res.industry}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setDraft((prev) => {
+                                const next = [...prev.residents];
+                                next[idx] = { ...next[idx], industry: val };
+                                return { ...prev, residents: next };
+                              });
+                            }}
+                            placeholder="Отрасль"
+                            className="rounded-lg border border-[var(--line)] bg-[var(--card)] px-3 py-2"
+                          />
+                          <select
+                            aria-label="Площадка резидента"
+                            value={res.objectId}
+                            onChange={(e) => {
+                              const val = Number(e.target.value);
+                              setDraft((prev) => {
+                                const next = [...prev.residents];
+                                next[idx] = { ...next[idx], objectId: val };
+                                return { ...prev, residents: next };
+                              });
+                            }}
+                            className="rounded-lg border border-[var(--line)] bg-[var(--card)] px-3 py-2"
                           >
-                            <Trash2 size={15} />
-                          </button>
+                            {draft.objects.map((o) => (
+                              <option key={o.id} value={o.id}>
+                                {o.name}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="flex gap-2">
+                            <input
+                              aria-label="Год заселения"
+                              value={res.sinceYear}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setDraft((prev) => {
+                                  const next = [...prev.residents];
+                                  next[idx] = { ...next[idx], sinceYear: val };
+                                  return { ...prev, residents: next };
+                                });
+                              }}
+                              placeholder="С какого года"
+                              className="flex-1 rounded-lg border border-[var(--line)] bg-[var(--card)] px-3 py-2 tabular"
+                            />
+                            <button
+                              type="button"
+                              className="text-red-700 px-2 cursor-pointer"
+                              aria-label="Удалить резидента"
+                              onClick={() =>
+                                setDraft((prev) => ({
+                                  ...prev,
+                                  residents: prev.residents.filter((r) => r.id !== res.id),
+                                }))
+                              }
+                            >
+                              <Trash2 size={15} />
+                            </button>
+                          </div>
                         </div>
+                        <input
+                          aria-label="Описание резидента"
+                          value={res.description}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setDraft((prev) => {
+                              const next = [...prev.residents];
+                              next[idx] = { ...next[idx], description: val };
+                              return { ...prev, residents: next };
+                            });
+                          }}
+                          placeholder="Описание деятельности на площадке"
+                          className="w-full rounded-lg border border-[var(--line)] bg-[var(--card)] px-3 py-2"
+                        />
                       </div>
                     ))}
                   </div>
@@ -899,7 +1295,7 @@ export function AdminPage({
                       key={item.id}
                       className="rounded-xl bg-[var(--bg)] border border-[var(--line)] p-4 space-y-2.5 text-sm"
                     >
-                      <div className="flex justify-between gap-2">
+                      <div className="flex flex-wrap justify-between gap-2">
                         <input
                           aria-label="Вопрос"
                           value={item.question}
@@ -911,8 +1307,26 @@ export function AdminPage({
                               return { ...prev, faqs: next };
                             });
                           }}
-                          className="flex-1 rounded-lg border border-[var(--line)] bg-[var(--card)] px-3 py-2 font-medium"
+                          className="flex-1 min-w-[240px] rounded-lg border border-[var(--line)] bg-[var(--card)] px-3 py-2 font-medium"
                         />
+                        <select
+                          aria-label="Категория вопроса"
+                          value={item.category}
+                          onChange={(e) => {
+                            const val = e.target.value as FaqItem['category'];
+                            setDraft((prev) => {
+                              const next = [...prev.faqs];
+                              next[idx] = { ...next[idx], category: val };
+                              return { ...prev, faqs: next };
+                            });
+                          }}
+                          className="rounded-lg border border-[var(--line)] bg-[var(--card)] px-2.5 py-2 text-xs"
+                        >
+                          <option value="rent">Аренда</option>
+                          <option value="utilities">Коммуникации</option>
+                          <option value="owners">Собственникам</option>
+                          <option value="terms">Условия</option>
+                        </select>
                         <button
                           type="button"
                           className="text-red-700 px-2 cursor-pointer"
@@ -927,6 +1341,21 @@ export function AdminPage({
                           <Trash2 size={15} />
                         </button>
                       </div>
+                      <label className="inline-flex items-center gap-2 text-xs mute cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={item.isPriorityAi}
+                          onChange={(e) => {
+                            const checked = e.target.checked;
+                            setDraft((prev) => {
+                              const next = [...prev.faqs];
+                              next[idx] = { ...next[idx], isPriorityAi: checked };
+                              return { ...prev, faqs: next };
+                            });
+                          }}
+                        />
+                        Приоритетный вопрос для ИИ-ответов (/llms.txt)
+                      </label>
                       <textarea
                         rows={2}
                         aria-label="Ответ"
@@ -1047,6 +1476,7 @@ export function AdminPage({
                 leadsCount={leads.length}
                 smtpConfigured={smtpConfigured}
                 token={token}
+                onImportBackup={(next) => setDraft(structuredClone(next))}
               />
             )}
           </div>

@@ -21,6 +21,11 @@ export function HomePage({
 }: HomePageProps) {
   const startFreeRooms = getStartFreeRooms(state.rooms, state.settings.featuredFreeLimit);
   const totalFreeRooms = state.rooms.filter((r) => r.status === 'free').length;
+  const theme = state.settings.theme;
+  const showInfra = theme?.showInfraOnHome !== false;
+  const showProcess = theme?.showProcessOnHome !== false;
+  const showFaq = theme?.showFaqOnHome !== false;
+  const showLeadForm = theme?.showLeadFormOnHome !== false;
 
   return (
     <>
@@ -29,6 +34,7 @@ export function HomePage({
         tenantsTotalCount={state.settings.tenantsTotalCount}
         objectsCount={state.objects.length}
         freeRoomsCount={totalFreeRooms}
+        showInfra={showInfra}
         onNavigate={onNavigate}
       />
 
@@ -165,57 +171,63 @@ export function HomePage({
       </section>
 
       {/* How We Work */}
-      <section className="c3-section" style={{ paddingTop: 0 }}>
-        <div className="w">
-          <ProcessTimeline />
-        </div>
-      </section>
+      {showProcess && (
+        <section className="c3-section" style={{ paddingTop: 0 }}>
+          <div className="w">
+            <ProcessTimeline />
+          </div>
+        </section>
+      )}
 
       {/* Key FAQ Preview */}
-      <section className="c3-section" style={{ paddingTop: 0 }}>
-        <div className="w">
-          <div className="flex flex-wrap items-end justify-between gap-4 mb-7">
-            <h2 className="c3-h2">Частые вопросы</h2>
-            <a
-              className="c3-btn l"
-              href="#/faq"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('faq');
-              }}
-            >
-              Все вопросы и ответы ({state.faqs.length})
-            </a>
-          </div>
+      {showFaq && (
+        <section className="c3-section" style={{ paddingTop: 0 }}>
+          <div className="w">
+            <div className="flex flex-wrap items-end justify-between gap-4 mb-7">
+              <h2 className="c3-h2">Частые вопросы</h2>
+              <a
+                className="c3-btn l"
+                href="#/faq"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onNavigate('faq');
+                }}
+              >
+                Все вопросы и ответы ({state.faqs.length})
+              </a>
+            </div>
 
-          <div className="c3-faq border-t border-[var(--line)]">
-            {state.faqs.slice(0, 5).map((item, idx) => (
-              <details key={item.id} open={idx === 0}>
-                <summary>{item.question}</summary>
-                <p>{item.answer}</p>
-              </details>
-            ))}
+            <div className="c3-faq border-t border-[var(--line)]">
+              {state.faqs.slice(0, 5).map((item, idx) => (
+                <details key={item.id} open={idx === 0}>
+                  <summary>{item.question}</summary>
+                  <p>{item.answer}</p>
+                </details>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Lead Form */}
-      <section className="c3-section" style={{ paddingTop: 0 }}>
-        <div className="w">
-          <div className="c3-fbox">
-            <h2 className="c3-h2">Остались вопросы?</h2>
-            <p className="mute mt-2">
-              Оставьте заявку — подберём помещение под вашу площадь, мощность и бюджет.
-            </p>
-            <LeadForm
-              type="tenant"
-              contacts={state.settings.contacts}
-              analytics={state.settings.analytics}
-              onNavigatePrivacy={() => onNavigate('privacy-policy')}
-            />
+      {showLeadForm && (
+        <section className="c3-section" style={{ paddingTop: 0 }}>
+          <div className="w">
+            <div className="c3-fbox">
+              <h2 className="c3-h2">Остались вопросы?</h2>
+              <p className="mute mt-2">
+                Оставьте заявку — подберём помещение под вашу площадь, мощность и бюджет.
+              </p>
+              <LeadForm
+                type="tenant"
+                contacts={state.settings.contacts}
+                analytics={state.settings.analytics}
+                onNavigatePrivacy={() => onNavigate('privacy-policy')}
+              />
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </>
   );
 }

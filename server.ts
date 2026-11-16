@@ -446,10 +446,8 @@ async function startServer(): Promise<void> {
   app.get('/api/beget/site.zip', requireAuth, async (_req, res) => {
     try {
       const distDir = path.resolve(process.cwd(), 'dist');
-      if (!fs.existsSync(path.join(distDir, 'index.html'))) {
-        const { build: viteBuild } = await import('vite');
-        await viteBuild({ logLevel: 'silent' });
-      }
+      const { build: viteBuild } = await import('vite');
+      await viteBuild({ logLevel: 'silent' });
       const zip = new JSZip();
       if (fs.existsSync(distDir)) {
         addDirToZip(zip, distDir, distDir);

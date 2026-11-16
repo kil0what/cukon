@@ -3,7 +3,7 @@ import JSZip from 'jszip';
 import { BarChart3, Check, Copy, Download, FileCode2, Globe, RefreshCw, Server } from 'lucide-react';
 import { ASSET_IMAGES } from '../shared/defaultData';
 import type { AnalyticsEventLog, CmsState } from '../shared/types';
-import { saveCmsState, testWordPressSync } from '../utils/api';
+import { apiFetch, saveCmsState, testWordPressSync } from '../utils/api';
 import { buildWordPressThemeFiles, buildWordPressWxrXml } from '../utils/wordpressExport';
 
 interface AdminIntegrationsTabProps {
@@ -51,7 +51,7 @@ export function AdminIntegrationsTab({
       if (token) {
         await saveCmsState(token, draft).catch(() => undefined);
       }
-      const res = await fetch('/api/beget/site.zip', {
+      const res = await apiFetch('beget/site.zip', {
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });
       if (!res.ok) {
@@ -60,7 +60,7 @@ export function AdminIntegrationsTab({
       const blob = await res.blob();
       triggerBlobDownload(blob, 'tsukon-beget-site.zip');
       setBegetNotice(
-        'Архив tsukon-beget-site.zip готов! Загрузите его в Beget (Файловый менеджер → cukon.rf/public_html) и нажмите «Распаковать».',
+        'Архив tsukon-beget-site.zip собран и готов! Загрузите его в public_html нужного домена на Beget (например, zukonar.beget.tech/public_html или cukon.rf/public_html) и нажмите «Распаковать».',
       );
     } catch (err) {
       setBegetNotice(
@@ -76,7 +76,7 @@ export function AdminIntegrationsTab({
   const handleDownloadThemeZip = async () => {
     setExportNotice(null);
     try {
-      const res = await fetch('/api/wordpress/theme.zip', {
+      const res = await apiFetch('wordpress/theme.zip', {
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });
       if (res.ok && res.headers.get('content-type')?.includes('zip')) {

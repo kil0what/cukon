@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle2, AlertCircle, BookOpen, KeyRound } from 'lucide-react';
+import { CheckCircle2, AlertCircle, BookOpen, Download, KeyRound, Upload } from 'lucide-react';
 import type { CmsState } from '../shared/types';
 import { evaluateTzCompliance } from '../utils/catalog';
 import { updateAdminPassword } from '../utils/api';
@@ -9,6 +9,7 @@ interface AdminLaunchTabProps {
   leadsCount: number;
   smtpConfigured: boolean;
   token: string;
+  onImportBackup: (next: CmsState) => void;
 }
 
 export function AdminLaunchTab({
@@ -16,12 +17,14 @@ export function AdminLaunchTab({
   leadsCount,
   smtpConfigured,
   token,
+  onImportBackup,
 }: AdminLaunchTabProps) {
   const auditItems = evaluateTzCompliance(draft, leadsCount);
   const passedCount = auditItems.filter((i) => i.passed).length;
 
   const [newPassword, setNewPassword] = useState('');
   const [pwdMsg, setPwdMsg] = useState<string | null>(null);
+  const [backupMsg, setBackupMsg] = useState<string | null>(null);
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -139,6 +142,75 @@ export function AdminLaunchTab({
             <strong className="text-[var(--ink)]">Яндекс.Вебмастер и ИИ-индексация:</strong> добавьте сайт в Яндекс.Вебмастер и отправьте на индексацию <code>/sitemap.xml</code> и <code>/llms.txt</code>.
           </li>
         </ol>
+      </div>
+
+      {/* JSON Backup & Restore */}
+      <div className="rounded-2xl bg-[var(--card)] border border-[var(--line)] p-6">
+        <div className="flex items-center gap-2 mb-2">
+          <Download size={18} />
+          <h2 className="c3-h3" style={{ fontSize: 18 }}>
+            Резервная копия сайта (бэкап и восстановление .json)
+          </h2>
+        </div>
+        <p className="text-xs mute mb-4 max-w-2xl">
+          Скачайте все объекты, помещения, тексты, резидентов, FAQ и настройки в один файл. Если нужно откатиться или перенести контент на другой домен — загрузите файл обратно и нажмите «Сохранить все изменения».
+        </p>
+        <div className="flex flex-wrap gap-3 items-center">
+          <button
+            type="button"
+            className="c3-btn"
+            onClick={() => {
+              const json = JSON.stringify(draft, null, 2);
+              const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `tsukon-backup-${new Date().toISOString().slice(0, 10)}.json`;
+              a.style.display = 'none';
+              document.body.appendChild(a);
+              a.click();
+              setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+              }, 800);
+              setBackupMsg('Резервная копия JSON скачана на устройство.');
+            }}
+          >
+            <Download size={15} />
+            <span>Скачать бэкап (.json)</span>
+          </button>
+
+          <label className="c3-btn l cursor-pointer">
+            <Upload size={15} />
+            <span>Восстановить из .json</span>
+            <input
+              type="file"
+              accept="application/json,.json"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = () => {
+                  try {
+                    const parsed = JSON.parse(String(reader.result || '')) as CmsState;
+                    if (!parsed || !Array.isArray(parsed.objects) || !Array.isArray(parsed.rooms) || !parsed.pages) {
+                      setBackupMsg('Ошибка: файл не является резервной копией CMS ЦУКОН.');
+                      return;
+                    }
+                    onImportBackup(parsed);
+                    setBackupMsg('Данные из бэкапа загружены в черновик. Нажмите «Сохранить все изменения» вверху.');
+                  } catch {
+                    setBackupMsg('Не удалось прочитать JSON-файл резервной копии.');
+                  }
+                };
+                reader.readAsText(file, 'utf-8');
+                e.target.value = '';
+              }}
+            />
+          </label>
+        </div>
+        {backupMsg && <p className="text-xs mt-2.5 font-medium text-[var(--ok)]">{backupMsg}</p>}
       </div>
 
       {/* Security & Handover Password */}

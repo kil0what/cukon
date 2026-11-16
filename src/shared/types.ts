@@ -96,12 +96,21 @@ export interface WordPressSettings {
   lastSyncMessage: string | null;
 }
 
+export interface CmsThemeSettings {
+  accentColor?: string;
+  showInfraOnHome?: boolean;
+  showProcessOnHome?: boolean;
+  showFaqOnHome?: boolean;
+  showLeadFormOnHome?: boolean;
+}
+
 export interface CmsSettings {
   featuredFreeLimit: number; // 5..7 free rooms on start per TZ 4.1
   tenantsTotalCount: string;
   contacts: ContactInfo;
   analytics: AnalyticsSettings;
   wordpress: WordPressSettings;
+  theme?: CmsThemeSettings;
 }
 
 export interface CmsState {

@@ -6,6 +6,51 @@ export interface CmsBootstrapResponse {
   smtpConfigured: boolean;
 }
 
+export type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+
+function isHtmlResponseText(text: string, contentType: string): boolean {
+  const trimmed = text.trim();
+  return trimmed.startsWith('<') || contentType.toLowerCase().includes('text/html');
+}
+
+export async function apiFetch(
+  route: string,
+  init?: RequestInit,
+  fetcher: FetchLike = fetch,
+): Promise<Response> {
+  const cleanRoute = route.replace(/^\/+/, '');
+  const primaryRes = await fetcher(`/api/${cleanRoute}`, init);
+
+  const primaryType = (primaryRes.headers.get('content-type') || '').toLowerCase();
+  let shouldFallbackToPhp = false;
+
+  if (primaryRes.status === 404 && !primaryType.includes('application/json')) {
+    shouldFallbackToPhp = true;
+  } else if (primaryType.includes('text/html')) {
+    shouldFallbackToPhp = true;
+  } else if (!primaryType.includes('application/json') && !primaryType.includes('zip') && !primaryType.includes('octet-stream')) {
+    const preview = await primaryRes.clone().text().catch(() => '');
+    if (preview.trim().startsWith('<')) {
+      shouldFallbackToPhp = true;
+    }
+  }
+
+  if (!shouldFallbackToPhp) {
+    return primaryRes;
+  }
+
+  // Fallback for hostings/subdomains where .htaccess RewriteRule ^api/ did not trigger
+  const phpRes = await fetcher(`api.php?route=${encodeURIComponent(cleanRoute)}`, init);
+  if (phpRes.status !== 404) {
+    return phpRes;
+  }
+  const phpType = (phpRes.headers.get('content-type') || '').toLowerCase();
+  if (phpType.includes('application/json')) {
+    return phpRes;
+  }
+  return primaryRes;
+}
+
 export async function parseApiJson<T>(res: Response, fallbackError: string): Promise<T & { error?: string }> {
   const text = await res.text();
   const trimmed = text.trim();
@@ -18,16 +63,16 @@ export async function parseApiJson<T>(res: Response, fallbackError: string): Pro
     return {} as T & { error?: string };
   }
 
-  if (trimmed.startsWith('<') || contentType.includes('text/html')) {
+  if (isHtmlResponseText(trimmed, contentType)) {
     const looksLikeSpaShell =
       /<!doctype\s+html/i.test(trimmed) && (trimmed.includes('id="root"') || trimmed.includes('ЦУКОН'));
     if (looksLikeSpaShell) {
       throw new Error(
-        'Сервер CMS (/api) недоступен по этому адресу: открыта статическая копия сайта (например, ссылка предпросмотра Share или папка без PHP/.htaccess). Для входа в CMS используйте панель разработки или загрузите пакет Beget (.zip) целиком в корень public_html.',
+        'Сервер CMS (/api и api.php) недоступен: открыта статическая копия сайта без серверной части. Если вы в AI Studio — используйте окно разработки (ais-dev), а если на Beget — загрузите полный пакет tsukon-beget-site.zip (с api.php, .htaccess и папкой data/) в public_html выбранного домена.',
       );
     }
     throw new Error(
-      `Сервер вернул HTML вместо ответа API (HTTP ${res.status}). Проверьте работу бэкенда CMS (Node.js или PHP api.php + .htaccess) и авторизацию в окне предпросмотра.`,
+      `Бэкенд CMS не ответил на запрос (HTTP ${res.status}, получен HTML вместо JSON). На Beget проверьте, что файлы из tsukon-beget-site.zip (index.html, api.php, .htaccess, data/) распакованы именно в папку public_html этого домена и для домена включён PHP.`,
     );
   }
 
@@ -42,14 +87,14 @@ export async function parseApiJson<T>(res: Response, fallbackError: string): Pro
 }
 
 export async function fetchCmsBootstrap(): Promise<CmsBootstrapResponse> {
-  const res = await fetch('/api/cms');
+  const res = await apiFetch('cms');
   const data = await parseApiJson<CmsBootstrapResponse>(res, 'Не удалось загрузить данные сайта');
   if (!res.ok || !data.state) throw new Error(data.error || 'Не удалось загрузить данные сайта');
   return data;
 }
 
 export async function loginAdmin(password: string): Promise<string> {
-  const res = await fetch('/api/auth/login', {
+  const res = await apiFetch('auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ password }),
@@ -62,7 +107,7 @@ export async function loginAdmin(password: string): Promise<string> {
 }
 
 export async function updateAdminPassword(token: string, newPassword: string): Promise<void> {
-  const res = await fetch('/api/auth/password', {
+  const res = await apiFetch('auth/password', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -75,7 +120,7 @@ export async function updateAdminPassword(token: string, newPassword: string): P
 }
 
 export async function saveCmsState(token: string, state: CmsState): Promise<CmsState> {
-  const res = await fetch('/api/cms', {
+  const res = await apiFetch('cms', {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -89,7 +134,7 @@ export async function saveCmsState(token: string, state: CmsState): Promise<CmsS
 }
 
 export async function resetCmsState(token: string): Promise<CmsState> {
-  const res = await fetch('/api/cms/reset', {
+  const res = await apiFetch('cms/reset', {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -112,7 +157,7 @@ export async function submitLead(payload: {
   captchaExpected: number;
   captchaAnswer: string;
 }): Promise<{ ok: boolean; lead: Pick<LeadSubmission, 'id' | 'createdAt' | 'status'> }> {
-  const res = await fetch('/api/leads', {
+  const res = await apiFetch('leads', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -128,7 +173,7 @@ export async function submitLead(payload: {
 }
 
 export async function fetchLeads(token: string): Promise<LeadSubmission[]> {
-  const res = await fetch('/api/leads', {
+  const res = await apiFetch('leads', {
     headers: { Authorization: `Bearer ${token}` },
   });
   const data = await parseApiJson<{ leads?: LeadSubmission[] }>(res, 'Ошибка загрузки заявок');
@@ -141,7 +186,7 @@ export async function updateLeadStatus(
   id: string,
   status: LeadSubmission['status'],
 ): Promise<LeadSubmission> {
-  const res = await fetch(`/api/leads/${id}`, {
+  const res = await apiFetch(`leads/${id}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
@@ -155,7 +200,7 @@ export async function updateLeadStatus(
 }
 
 export async function deleteLead(token: string, id: string): Promise<void> {
-  const res = await fetch(`/api/leads/${id}`, {
+  const res = await apiFetch(`leads/${id}`, {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -169,7 +214,7 @@ export async function postAnalyticsEvent(payload: {
   meta?: string;
 }): Promise<void> {
   try {
-    await fetch('/api/analytics/event', {
+    await apiFetch('analytics/event', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -183,7 +228,7 @@ export async function fetchAnalyticsStats(token: string): Promise<{
   events: AnalyticsEventLog[];
   counts: Record<string, number>;
 }> {
-  const res = await fetch('/api/analytics/stats', {
+  const res = await apiFetch('analytics/stats', {
     headers: { Authorization: `Bearer ${token}` },
   });
   const data = await parseApiJson<{
@@ -195,7 +240,7 @@ export async function fetchAnalyticsStats(token: string): Promise<{
 }
 
 export async function testWordPressSync(token: string, siteUrl: string): Promise<WordPressSettings> {
-  const res = await fetch('/api/wordpress/sync', {
+  const res = await apiFetch('wordpress/sync', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

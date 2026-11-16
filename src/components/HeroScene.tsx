@@ -7,6 +7,7 @@ interface HeroSceneProps {
   tenantsTotalCount: string;
   objectsCount: number;
   freeRoomsCount: number;
+  showInfra?: boolean;
   onNavigate: (route: string, scrollTarget?: string) => void;
 }
 
@@ -15,6 +16,7 @@ export function HeroScene({
   tenantsTotalCount,
   objectsCount,
   freeRoomsCount,
+  showInfra = true,
   onNavigate,
 }: HeroSceneProps) {
   const [activeInfra, setActiveInfra] = useState<string | null>(null);
@@ -138,22 +140,24 @@ export function HeroScene({
           </svg>
         </div>
 
-        <div className="c3-inf" onMouseLeave={() => setActiveInfra(null)}>
-          {INFRASTRUCTURE_ITEMS.map((item) => (
-            <button
-              key={item.key}
-              type="button"
-              className={activeInfra === item.key ? 'active' : ''}
-              onMouseEnter={() => setActiveInfra(item.key)}
-              onFocus={() => setActiveInfra(item.key)}
-              onBlur={() => setActiveInfra(null)}
-              onClick={() => setActiveInfra((prev) => (prev === item.key ? null : item.key))}
-            >
-              <h3 className="c3-h3">{item.title}</h3>
-              <p>{item.desc}</p>
-            </button>
-          ))}
-        </div>
+        {showInfra && (
+          <div className="c3-inf" onMouseLeave={() => setActiveInfra(null)}>
+            {INFRASTRUCTURE_ITEMS.map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                className={activeInfra === item.key ? 'active' : ''}
+                onMouseEnter={() => setActiveInfra(item.key)}
+                onFocus={() => setActiveInfra(item.key)}
+                onBlur={() => setActiveInfra(null)}
+                onClick={() => setActiveInfra((prev) => (prev === item.key ? null : item.key))}
+              >
+                <h3 className="c3-h3">{item.title}</h3>
+                <p>{item.desc}</p>
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="c3-stats">
           <div>

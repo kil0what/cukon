@@ -173,6 +173,13 @@ export default function App() {
 
     initYandexMetrika(cmsState.settings.analytics);
     trackPageHit(cmsState.settings.analytics, `/#/${route}`);
+
+    const accent = cmsState.settings.theme?.accentColor?.trim();
+    if (accent && /^#[0-9a-fA-F]{3,8}$/.test(accent)) {
+      document.documentElement.style.setProperty('--acc', accent);
+    } else {
+      document.documentElement.style.removeProperty('--acc');
+    }
   }, [route, cmsState]);
 
   const navigate = useCallback((nextRoute: string, scrollTarget?: string) => {
